@@ -6,7 +6,6 @@
 package labtp13;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,26 +31,8 @@ public class LabTP13 {
             Connection con = DriverManager.getConnection(bd, usuario, password);
 
             boolean estadoConsulta = false;
-
-//            String sql="SELECT * FROM alumno WHERE estado = ?";
-//            
-//            PreparedStatement ps=con.prepareStatement(sql);
-//            ps.setBoolean(1, estadoConsulta);
-//            ResultSet datos=ps.executeQuery();
-//            while(datos.next()){
-//            
-//                int idAlumno=datos.getInt("idAlumno");
-//                int dni=datos.getInt("dni");
-//                String apellido=datos.getString("apellido");
-//                String nombre=datos.getString("nombre");
-//                Date fechaN=datos.getDate("fechaNacimiento");
-//                boolean estado=datos.getBoolean("estado");
-//                
-//                System.out.println("idAlumno "+idAlumno);
-//                System.out.println("Apellido "+apellido);
-//                System.out.println("Fecha de nacimiento "+fechaN);
-//            }
-//            
+            
+            // Insertar 3 alumnos
             String sql = "INSERT INTO "
                     + "alumno(dni, apellido, nombre, fechaNacimiento, estado) "
                     + "VALUES (9998885,'Martinez','Maria','2000-04-25',1),"
@@ -61,9 +42,67 @@ public class LabTP13 {
             PreparedStatement ps = con.prepareStatement(sql);
             int filas = ps.executeUpdate();
             if (filas > 0) {
-
                 JOptionPane.showMessageDialog(null, "Alumno Agregado");
+            }
+            // Insertar 4 materias
+            String sqlInsertMaterias = "INSERT INTO materia(nombre) VALUES "
+                    + "('Matemáticas'),"
+                    + "('Física'),"
+                    + "('Química'),"
+                    + "('Historia')";
+            ps = con.prepareStatement(sqlInsertMaterias);
+            int filasMaterias = ps.executeUpdate();
+            if (filasMaterias > 0) {
+                JOptionPane.showMessageDialog(null, "Materias Agregadas");
+            }
 
+            //  Inscribir a los 3 alumnos en 2 materias cada uno
+            String sqlInscribirAlumnos = "INSERT INTO inscripcion(idAlumno, idMateria) VALUES "
+                    + "(1, 1),"
+                    + 
+                    "(1, 2),"
+                    + 
+                    "(2, 1),"
+                    + 
+                    "(2, 3),"
+                    + 
+                    "(3, 2),"
+                    + 
+                    "(3, 4)";
+            ps = con.prepareStatement(sqlInscribirAlumnos);
+            int filasInscripciones = ps.executeUpdate();
+            if (filasInscripciones > 0) {
+                JOptionPane.showMessageDialog(null, "Alumnos Inscritos en Materias");
+            }
+
+            //Listar los datos de los alumnos con calificaciones superiores a 8
+            String sqlAlumnosCalificaciones = "SELECT a.idAlumno, a.dni, a.apellido, a.nombre, i.calificacion "
+                    + "FROM alumno a "
+                    + "JOIN inscripcion i ON a.idAlumno = i.idAlumno "
+                    + "WHERE i.calificacion > 8";
+            ps = con.prepareStatement(sqlAlumnosCalificaciones);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int idAlumno = rs.getInt("idAlumno");
+                int dni = rs.getInt("dni");
+                String apellido = rs.getString("apellido");
+                String nombre = rs.getString("nombre");
+                double calificacion = rs.getDouble("calificacion");
+
+                System.out.println("ID Alumno: " + idAlumno);
+                System.out.println("DNI: " + dni);
+                System.out.println("Apellido: " + apellido);
+                System.out.println("Nombre: " + nombre);
+                System.out.println("Calificación: " + calificacion);
+                System.out.println("---------------------------");
+            }
+
+            // Desinscribir un alumno de una de las materias
+            String sqlDesinscribirAlumno = "DELETE FROM inscripcion WHERE idAlumno = 1 AND idMateria = 2";
+            ps = con.prepareStatement(sqlDesinscribirAlumno);
+            int filasDesinscripcion = ps.executeUpdate();
+            if (filasDesinscripcion > 0) {
+                JOptionPane.showMessageDialog(null, "Alumno Desinscrito de la Materia");
             }
 
         } catch (ClassNotFoundException ex) {
